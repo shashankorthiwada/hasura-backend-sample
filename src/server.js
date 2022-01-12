@@ -26,39 +26,44 @@ const execute = async (variables, reqHeaders) => {
   const fetchResponse = await fetch(
     "https://climbing-calf-50.hasura.app/v1/graphql",
     {
-      method: 'POST',
-      headers: {
-        ...reqHeaders,
-        'x-hasura-access-key': process.env.HASURA_GRAPHQL_ADMIN_SECRET
-      } || {},
+      method: "POST",
+      headers:
+        {
+          ...reqHeaders,
+          "x-hasura-access-key":
+            process.env.HASURA_GRAPHQL_ADMIN_SECRET,
+        } || {},
       body: JSON.stringify({
         query: REGISTRATION,
-        variables
-      })
+        variables,
+      }),
     }
   );
   const data = await fetchResponse.json();
   return data;
 };
-  
 
 // Request Handler
-app.post('/register', async (req, res) => {
-
+app.post("/register", async (req, res) => {
   // get request input
   const { name, username, email, password } = req.body.input;
 
   // encrypt the password
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  const { data, errors } = await execute({ name, username, email, password: hashedPassword });
+  const { data, errors } = await execute({
+    name,
+    username,
+    email,
+    password: hashedPassword,
+  });
 
   if (errors) {
-    return res.status(400).json(errors[0])
+    return res.status(400).json(errors[0]);
   }
 
   return res.json({
-    ...data.insert_users_one
+    ...data.insert_users_one,
   });
 });
 
